@@ -43,7 +43,7 @@ $maroon: #621A4C;
   text-align: left;
 
 }
-@media (max-width: 600px) {
+@media (max-width: 700px) {
  .split-pane {
    display: block;
  } 
@@ -60,9 +60,6 @@ form {
     font-size: 14px;
     line-height: 20px;
     
-    &:not(:first-child) {
-      margin-top: 50px;
-    }
     // input {
     //   &::placeholder {
     //     color: red;
@@ -88,6 +85,10 @@ form {
   input {
     display: inline-block;
     width: 100%;
+    margin-bottom: 50px;
+    padding: 10px 0;
+    border: none;
+    border-bottom: 1px solid $maroon;
   }
 }
 
@@ -111,6 +112,7 @@ h2 {
 
 table {
   padding-top: 45px;
+  text-align: left;
   th {
     width: 45px;
     &:first-child {

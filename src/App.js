@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './App.scss';
+const axios = require('axios');
 
 class App extends Component {
   
@@ -7,7 +8,8 @@ class App extends Component {
     super();
     this.state = {
       name: '',
-      status: ''
+      status: '',
+      statuses: []
     }
 
     this.submit = this._submit.bind(this);
@@ -31,13 +33,13 @@ class App extends Component {
               Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non.
             </p>
           </article>
-          <form className="split-pane" action="localhost://3001/status/set" method="post" id="status-update">
+          <form className="split-pane" id="status-update" onSubmit={e => e.preventDefault()}>
             <label>Full Name<br />
-              <input type="text" placeholder="John" name="name" required/>
+              <input type="text" placeholder="John" name="name" id="name"/>
             </label>
             <br />
             {/* <label >Status<br /> */}
-            <input type="text" placeholder="Status" name="status" required/>
+            <input type="text" placeholder="Status" name="status" id="status"/>
           </form>
         </section>
         <button className="submit" onClick={this.submit}>Submit</button>
@@ -55,6 +57,11 @@ class App extends Component {
             </tr>
           </thead>
           <tbody>
+          {
+            this.state.statuses && this.state.statuses.map((rec, index) => {
+              return (<tr key={index}><td>{rec.name}</td><td>{rec.status}</td></tr>)
+            }) || null
+          }
 
           </tbody>
         </table>
@@ -64,19 +71,33 @@ class App extends Component {
   }
 
   async _submit() {
-    console.log('this ', this.state)
-    const res = await document.getElementById('status-update').submit();
-    console.log('res is ', res)
+    const name = document.getElementById('name').value;
+    const status = document.getElementById('status').value;
+
+    if(!name || !status) {
+      return;
+    }
+
+
+    const res = await axios.post('http://localhost:3001/status/set', {name, status}, {mode:'cors'});
+    // const res = await axios.post('http://localhost:3001/status/set', JSON.stringify({name, status}, {mode:'cors'}));
+    await this.pullStatuses();
+
   }
 
-  componentDidMount() {
-    fetch("localhost:3001/status/getAll")
-      .then( res => {
-        console.log('res is ', res)
-      })
-      .catch(err => {
-        console.error('err is ',err)
-      })
+  async componentDidMount() {
+    await this.pullStatuses();
+  }
+
+  async pullStatuses() {
+    let res;
+    try {
+      res = await axios.get('http://localhost:3001/status/getAll');
+    } catch(e) {
+      console.error( 'Failed to retrieve: ', e);
+    }
+
+    return this.setState({ statuses: res.data });
   }
 }
 
